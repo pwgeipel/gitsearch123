@@ -1,24 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react'
+import Navbar from './components/navbar'
+import SavedPage from './pages/saved'
+import SearchPage from './pages/search'
+
+
+
 
 function App() {
+  const [view, setView] = useState('search')
+
+
+  const renderView = () => {
+   
+
+    if (view === 'search') {
+      return <SearchPage />
+    } else if (view === 'saved') {
+      return  <SavedPage />
+    } else {
+      return 'No matching view found'
+    }
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  <>
+    <Navbar 
+    view={view}
+    setView={setView} 
+    />
+      { renderView() }
+  </>
   );
 }
 
