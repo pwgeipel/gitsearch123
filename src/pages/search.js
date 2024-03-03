@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 import Container from "../components/container"
 import SearchForm from '../components/searchForm'
 import Spinner from '../components/spinner'
+import List from '../components/list'
+import ListItem from '../components/listItem'
 import API from "../utils/api"
+import { lsKey } from '../utils/constants'
 
 
 const SearchPage = () => {
@@ -10,6 +13,12 @@ const SearchPage = () => {
     const [loading, setLoading] = useState(false)
     const [repos, setRepos] = useState([])
     const [savedRepos, setSavedRepos] = useState([])
+
+    useEffect(() => {
+        loadSavedRepos()
+    }, [])
+
+    
 
     const searchRepos = async () => {
         if (term) {
@@ -26,7 +35,24 @@ const SearchPage = () => {
             }
         }
     }
-        
+    
+    const loadSavedRepos = () => {
+        const lsRepos = JSON.parse(localStorage.getItem(lsKey)) || []
+        setSavedRepos(lsRepos)
+    }
+
+    const toggleSaved = repo => {
+        const foundRepo = savedRepos.find(savedRepo => savedRepo.id === repo.id)
+
+        let updatedSavedRepos
+        if (foundRepo) {
+            updatedSavedRepos = savedRepos.filter(savedRepo => savedRepo.id != repo.id)
+        } else {
+            updatedSavedRepos = [...savedRepos, repo]
+        }
+        localStorage.setItem(lsKey, JSON.stringify(updatedSavedRepos))
+        loadSavedRepos()
+    }
 
 
     return (
@@ -38,9 +64,22 @@ const SearchPage = () => {
     handleSubmit={searchRepos}
     />
 
+    <br />
+
         {loading
             ? <Spinner />
-            : <pre>{JSON.stringify(repos, null, 2) }</pre>
+            : <List>
+                {repos.map(repo => {
+                    const foundRepo = savedRepos.find(savedRepo => savedRepo.id === repo.id)
+                    return (
+                        <ListItem 
+                        repo={repo}
+                        saved={foundRepo}
+                        toggleSaved={toggleSaved}
+                        key={repo.id}
+                        />
+                )})}
+            </List>
     }
         
 </Container>
